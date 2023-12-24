@@ -25,6 +25,12 @@
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Assembly-CSharp.dll</HintPath>
       <Private>False</Private>
     </Reference>
+    <Reference Include="PluginConfigurator">
+      <HintPath>lib\PluginConfigurator.dll</HintPath>
+    </Reference>
+    <Reference Include="PluginConfiguratorComponents">
+      <HintPath>lib\PluginConfiguratorComponents.dll</HintPath>
+    </Reference>
     <Reference Include="Unity.Addressables">
       <HintPath>..\..\..\..\..\..\Program Files (x86)\Steam\steamapps\common\ULTRAKILL\ULTRAKILL_Data\Managed\Unity.Addressables.dll</HintPath>
       <Private>False</Private>
@@ -370,5 +376,9 @@
       <Private>False</Private>
     </Reference>
     <EmbeddedResource Include="C:\Users\User\Unity Projects\ULTRAKILL Modding\Assets\AssetBundles\healthbars" />
+  </ItemGroup>
+  
+  <ItemGroup>
+    <Folder Include="lib\" />
   </ItemGroup>
 </Project>

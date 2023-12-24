@@ -6,6 +6,9 @@
 # Thunderstore shit
 thunderstore/
 
+# exclude libraries
+lib/
+
 # User-specific files
 *.rsuser
 *.suo
