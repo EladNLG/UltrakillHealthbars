@@ -49,7 +49,8 @@ namespace Healthbars
             // PluginConfigurator
             config = PluginConfigurator.Create("Healthbars", "me.eladnlg.healthbars");
             config.SetIconWithURL("https://raw.githubusercontent.com/EladNLG/UltrakillHealthbars/main/assets/icon.png");
-            displayMode = new EnumField<DisplayMode>(config.rootPanel, "Display Mode", "displayMode", DisplayMode.Normalized);
+            displayMode = new EnumField<DisplayMode>(config.rootPanel, "Display Mode", "displayMode", DisplayMode.Accurate);
+            displayMode.SetEnumDisplayName(DisplayMode.Accurate, "Accurate/Vanilla");
             bossColor = new ColorField(config.rootPanel, "Boss Healthbar Color", "bossColor", new Color(1f, 0.28f, 0.28f));
             normalColor = new ColorField(config.rootPanel, "Regular Healthbar Color", "normalColor", new Color(1f, 0.82f, 0.28f));
             blessedColor = new ColorField(config.rootPanel, "Blessed Healthbar Color", "blessedColor", new Color(0.28f, 0.82f, 1f));
@@ -60,7 +61,7 @@ Personal Recommendations:
 4.5 - Streetcleaners and above display healthbar
 0 - All enemies display healthbar", 16);
             minMaxHealth = new FloatField(config.rootPanel, "Min Health", "minHealth", 0f);
-            useTotalHealth = new BoolField(config.rootPanel, "Increase healthbar length with radiance tiers", "useTotalHealth", false);
+            useTotalHealth = new BoolField(config.rootPanel, "Increase healthbar length with radiance tiers", "useTotalHealth", true);
             
             Harmony patcher = new Harmony("me.eladnlg.healthbars");
             patcher.PatchAll();
