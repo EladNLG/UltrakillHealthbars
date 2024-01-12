@@ -7,6 +7,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Healthbars;
 using UnityEngine.ProBuilder.MeshOperations;
+using PluginConfig.API.Fields;
 
 public enum DisplayMode
 {
@@ -27,23 +28,30 @@ public class Healthbar : MonoBehaviour
     public EnemyIdentifier enemy;
     public Transform head;
 
+    // change the buffer if we change how the bar looks!
+    private const int BUFFER = 6;
 
     float timeSinceDamaged = 99.9f;
     float lastHealth = 0f;
     float maxHealth = 0f;
     float damage = 0f;
+    float healthMultiplier = 1f;
 
     public void Start()
     {
         rectTransform = transform as RectTransform;
         lastHealth = enemy.health;
         maxHealth = enemy.health;
+        healthMultiplier = enemy.totalHealthModifier;
 
-        // change the buffer if we change how the bar looks!
-        const int BUFFER = 6;
+        Plugin.useTotalHealth.onValueChange += UpdateHealthbarLength;
 
         // set size based on max health
-        rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth) * 25f), rectTransform.sizeDelta.y);
+        if (Plugin.useTotalHealth.value)
+            rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth * healthMultiplier) * 25f), rectTransform.sizeDelta.y);
+        else
+            rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth) * 25f), rectTransform.sizeDelta.y);
+
         bar.rectTransform.sizeDelta = new Vector2(-BUFFER, bar.rectTransform.sizeDelta.y);
         barBG.rectTransform.sizeDelta = bar.rectTransform.sizeDelta;
 
@@ -73,15 +81,29 @@ public class Healthbar : MonoBehaviour
             canvasGroup.alpha = 0f;
         }
         rectTransform.position = point + new Vector3(0, 12, 0);
-        
+
+        float newHealthMultiplier = enemy.totalHealthModifier;
+        if (newHealthMultiplier != healthMultiplier)
+        {
+            healthMultiplier = newHealthMultiplier;
+
+            // set size based on max health
+            if (Plugin.useTotalHealth.value)
+            {
+                rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth * healthMultiplier) * 25f), rectTransform.sizeDelta.y);
+                bar.rectTransform.sizeDelta = new Vector2(-BUFFER, bar.rectTransform.sizeDelta.y);
+                barBG.rectTransform.sizeDelta = bar.rectTransform.sizeDelta;
+            }
+        }
+
         // update timeSinceDamaged
         if (lastHealth != enemy.health && (lastHealth > 0f || enemy.health > 0f))
         {
             float actualHealth = Mathf.Max(lastHealth, 0f);
             if (timeSinceDamaged <= 4f)
-                damage += Mathf.Min(lastHealth - enemy.health, actualHealth);
+                damage += Mathf.Min(lastHealth - enemy.health, actualHealth) * healthMultiplier;
             else
-                damage = Mathf.Min(lastHealth - enemy.health, actualHealth);
+                damage = Mathf.Min(lastHealth - enemy.health, actualHealth) * healthMultiplier;
             lastHealth = enemy.health;
             timeSinceDamaged = 0f;
         }
@@ -97,11 +119,12 @@ public class Healthbar : MonoBehaviour
         switch (Plugin.displayMode.value)
         {
             case DisplayMode.Normalized:
-                label.text = $"{Mathf.CeilToInt(Mathf.Max(enemy.health * 100f, 0f))}<space=0.25em><size=75%><color=#FFFA>{Mathf.CeilToInt(maxHealth * 100f)}";
+                label.text = 
+                    $"{Mathf.CeilToInt(Mathf.Max(enemy.health * 100f * healthMultiplier, 0f))}<space=0.25em><size=75%><color=#FFFA>{Mathf.CeilToInt(maxHealth * healthMultiplier * 100f)}";
                 break;
             case DisplayMode.Accurate:
-                string maxHealthStr = (Mathf.CeilToInt(maxHealth * 100f) / 100f).ToString();
-                string healthStr = (Mathf.CeilToInt(Mathf.Max(enemy.health * 100f, 0f)) / 100f).ToString("0.00");
+                string maxHealthStr = (Mathf.CeilToInt(maxHealth * 100f * healthMultiplier) / 100f).ToString();
+                string healthStr = (Mathf.CeilToInt(Mathf.Max(enemy.health * 100f * healthMultiplier, 0f)) / 100f).ToString("0.00");
                 label.text = $"{healthStr}<space=0.25em><size=75%><color=#FFFA>{maxHealthStr}";
                 break;
         }
@@ -157,8 +180,23 @@ public class Healthbar : MonoBehaviour
         }
     }
 
+    void UpdateHealthbarLength(BoolField.BoolValueChangeEvent data)
+    {
+        // set size based on max health
+        if (data.value)
+        {
+            rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth * healthMultiplier) * 25f), rectTransform.sizeDelta.y);
+        }
+        else
+        {
+            rectTransform.sizeDelta = new Vector2(Mathf.CeilToInt(Mathf.Sqrt(maxHealth) * 25f), rectTransform.sizeDelta.y);
+        }
+        bar.rectTransform.sizeDelta = new Vector2(-BUFFER, bar.rectTransform.sizeDelta.y);
+        barBG.rectTransform.sizeDelta = bar.rectTransform.sizeDelta;
+    }
+
     void OnDestroy()
     {
-
+        Plugin.useTotalHealth.onValueChange -= UpdateHealthbarLength;
     }
 }

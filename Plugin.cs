@@ -5,7 +5,9 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using PluginConfig.API;
 using PluginConfig.API.Fields;
+using PluginConfig.API.Decorators;
 using JetBrains.Annotations;
+using PluginConfiguratorComponents;
 
 namespace Healthbars
 {
@@ -23,6 +25,8 @@ namespace Healthbars
         public static ColorField bossColor;
         public static ColorField normalColor;
         public static ColorField blessedColor;
+        public static FloatField minMaxHealth;
+        public static BoolField useTotalHealth;
 
         private void Awake()
         {
@@ -49,6 +53,14 @@ namespace Healthbars
             bossColor = new ColorField(config.rootPanel, "Boss Healthbar Color", "bossColor", new Color(1f, 0.28f, 0.28f));
             normalColor = new ColorField(config.rootPanel, "Regular Healthbar Color", "normalColor", new Color(1f, 0.82f, 0.28f));
             blessedColor = new ColorField(config.rootPanel, "Blessed Healthbar Color", "blessedColor", new Color(0.28f, 0.82f, 1f));
+            new ConfigHeader(config.rootPanel, 
+                @"The minimum BASE health (inclusive) of an enemy to display a healthbar.
+Personal Recommendations:
+5 - Schisms and above display healthbar
+4.5 - Streetcleaners and above display healthbar
+0 - All enemies display healthbar", 16);
+            minMaxHealth = new FloatField(config.rootPanel, "Min Health", "minHealth", 0f);
+            useTotalHealth = new BoolField(config.rootPanel, "Increase healthbar length with radiance tiers", "useTotalHealth", false);
             
             Harmony patcher = new Harmony("me.eladnlg.healthbars");
             patcher.PatchAll();
