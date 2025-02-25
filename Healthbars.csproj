@@ -377,7 +377,6 @@
     </Reference>
     <EmbeddedResource Include="C:\Users\User\Unity Projects\ULTRAKILL Modding\Assets\AssetBundles\healthbars" />
   </ItemGroup>
-  
   <ItemGroup>
     <Folder Include="lib\" />
   </ItemGroup>
